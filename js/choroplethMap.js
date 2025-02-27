@@ -98,43 +98,6 @@ class ChoroplethMap {
         vis.height + vis.config.margin.top + vis.config.margin.bottom
       );
 
-    // vis.counties = vis.g
-    //   .append("g")
-    //   .attr("id", "counties")
-    //   .selectAll("path")
-    //   .data(topojson.feature(vis.us, vis.us.objects.counties).features)
-    //   .enter()
-    //   .append("path")
-    //   .attr("d", vis.path)
-    //   .attr("class", "county-boundary")
-    //   .attr("fill", (d) => {
-    //     if (d.properties.pop) {
-    //       return vis.colorScale(d.properties.Value);
-    //     } else {
-    //       return "url(#lightstripe)";
-    //     }
-    // });
-
-    // vis.counties
-    //   .on("mousemove", (d, event) => {
-    //     // console.log(d);
-    //     // console.log(event);
-    //     const popDensity = d.properties.Value
-    //       ? `<strong>${d.properties.Value}</strong> pop. density per km<sup>2</sup>`
-    //       : "No data available";
-    //     d3
-    //       .select("#tooltip")
-    //       .style("display", "block")
-    //       .style("left", event.pageX + vis.config.tooltipPadding + "px")
-    //       .style("top", event.pageY + vis.config.tooltipPadding + "px").html(`
-    //                     <div class="tooltip-title">${d.properties.name}</div>
-    //                     <div>${popDensity}</div>
-    //                   `);
-    //   })
-    //   .on("mouseleave", () => {
-    //     d3.select("#tooltip").style("display", "none");
-    //   });
-
     vis.g
       .append("path")
       .datum(
@@ -148,6 +111,16 @@ class ChoroplethMap {
 
   updateVis(attribute) {
     let vis = this;
+    let colorRange = (attr) => {
+      if (attr === "Value") {
+        return ["#f7fcf5", "#00441b"];
+      } else if (attr === "Value_x") {
+        return ["#fcfbfd", "#3f007d"];
+      } else if (attr === "Value_y") {
+        return ["#f7fbff", "#08306b"];
+      }
+      return ["#f7fcf5", "#00441b"];
+    };
     const mock = d3.extent(vis.data.objects.counties.geometries, (d) => {
       // console.log(d.properties.Value);
       return d.properties.Value;
@@ -161,7 +134,8 @@ class ChoroplethMap {
           return d.properties[attribute];
         })
       )
-      .range(["#f7fcf5", "#00441b"])
+      .range(colorRange(attribute))
+      // .range(["#f7fbff", "#08306b"])
       .interpolate(d3.interpolateHcl);
 
     vis.counties = vis.g
@@ -171,8 +145,8 @@ class ChoroplethMap {
       .data(topojson.feature(vis.us, vis.us.objects.counties).features)
       .enter()
       .append("path")
+      .attr("class", "county")
       .attr("d", vis.path)
-      .attr("class", "county-boundary")
       .attr("fill", (d) => {
         if (d.properties[attribute]) {
           return vis.colorScale(d.properties[attribute]);
@@ -180,29 +154,56 @@ class ChoroplethMap {
           return "url(#lightstripe)";
         }
       });
-    // below for tooltip data
 
+    // Interaction
     vis.counties
       .on("mousemove", (d, event) => {
         // console.log(d);
         // console.log(event);
-        const tooltipData = d.properties[attribute]
-          ? // this should be change after strong tag to match what kind of data is beng shown
-            // may need further logic to adjust the content of the tooltip
-            `<strong>${d.properties[attribute]}</strong> pop. density per km<sup>2</sup>`
-          : "No data available";
-        d3
-          .select("#tooltip")
-          .style("display", "block")
-          .style("left", event.pageX + vis.config.tooltipPadding + "px")
-          .style("top", event.pageY + vis.config.tooltipPadding + "px").html(`
+        if (attribute === "Value") {
+          const tooltipData = d.properties[attribute]
+            ? // this should be change after strong tag to match what kind of data is beng shown
+              // may need further logic to adjust the content of the tooltip
+              `<strong>${d.properties[attribute]}$</strong> Median Household Income`
+            : "No data available";
+          d3
+            .select("#tooltip")
+            .style("display", "block")
+            .style("left", event.pageX + vis.config.tooltipPadding + "px")
+            .style("top", event.pageY + vis.config.tooltipPadding + "px").html(`
                       <div class="tooltip-title">${d.properties.name}</div>
-                      <div>${tooltipData}</div>
-                    `);
+                      <div>${tooltipData}</div> `);
+        } else if (attribute === "Value_x") {
+          const tooltipData = d.properties[attribute]
+            ? `<strong>${d.properties[attribute]}%</strong> Percent of Population that are Immigrants`
+            : "No data available";
+          d3
+            .select("#tooltip")
+            .style("display", "block")
+            .style("left", event.pageX + vis.config.tooltipPadding + "px")
+            .style("top", event.pageY + vis.config.tooltipPadding + "px").html(`
+                      <div class="tooltip-title">${d.properties.name}</div>
+                      <div>${tooltipData}</div> `);
+        } else {
+          const tooltipData = d.properties[attribute]
+            ? `<strong>${d.properties[attribute]}</strong> Employed Population`
+            : "No data available";
+          d3
+            .select("#tooltip")
+            .style("display", "block")
+            .style("left", event.pageX + vis.config.tooltipPadding + "px")
+            .style("top", event.pageY + vis.config.tooltipPadding + "px").html(`
+                      <div class="tooltip-title">${d.properties.name}</div>
+                      <div>${tooltipData}</div> `);
+        }
       })
-      .on("mouseleave", () => {
-        d3.select("#tooltip").style("display", "none");
-      });
+      .on("click", function (d) {
+        d3.selectAll(".county").style("opacity", "0.2");
+        d3.select(this).attr("class", "active");
+        d3.selectAll(".active").style("opacity", "1");
+      })
+      .on("mouseover", mouseOver)
+      .on("mouseout", mouseOut);
   }
 }
 
@@ -211,7 +212,13 @@ let mouseOver = function (d) {
   d3.select(this)
     .transition()
     .duration(100)
-    .style("opacity", 1)
-    .style("stroke", "white")
+    .style("stroke", "#5555ff")
     .style("stroke-width", 1.5);
+};
+
+let mouseOut = function (d) {
+  d3.select(this).transition().duration(100).style("stroke", "none");
+
+  // Unshow tooltip
+  d3.select("#tooltip").style("display", "none");
 };
