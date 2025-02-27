@@ -20,8 +20,14 @@
       <option value="Value_x">Immigrant Population</option>
       <option value="Value_y">Employment</option>
     </select>
-
-    <div class="viz"></div>
+    <flexbox>
+      <h3>Choropleth Map of the Data</h3>
+      <div class="viz"></div>
+      <h3>Scatter Plot Median Household Income vs Employed Population</h3>
+      <div class="scatter">
+        <svg id="scatter"></svg>
+      </div>
+    </flexbox>
 
     <svg height="5" width="5" xmlns="http://www.w3.org/2000/svg" version="1.1">
       <defs>
@@ -43,14 +49,16 @@
     </svg>
 
     <div id="tooltip"></div>
+    <div id="tooltip2"></div>
     <script
       type="text/javascript"
       src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js"
     ></script>
     <script src="js/topojson.v3.js"></script>
-
-    <!-- <script src="js/d3.v6.min.js"></script> -->
+    <!-- 
+    <script src="js/d3.v6.min.js"></script> -->
     <!-- <script src="js/topojson.v3.js"></script> -->
+    <script src="js/scatter.js"></script>
     <script src="js/choroplethMap.js"></script>
     <script src="js/main.js"></script>
   </body>

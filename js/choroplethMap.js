@@ -10,7 +10,7 @@ class ChoroplethMap {
       containerWidth: _config.containerWidth || 1000,
       containerHeight: _config.containerHeight || 500,
       margin: _config.margin || { top: 10, right: 10, bottom: 10, left: 10 },
-      tooltipPadding: 10,
+      tooltipPadding: _config.tooltipPadding || 15,
       legendBottom: 50,
       legendLeft: 50,
       legendRectHeight: 12,
@@ -107,6 +107,37 @@ class ChoroplethMap {
       )
       .attr("id", "state-borders")
       .attr("d", vis.path);
+
+    // Legend not working yet... I wonder if it has to do with the update function doing the work of a rendervis.
+    // // Legend
+    // // Initialize gradient that we will later use for the legend
+    // vis.linearGradient = vis.svg
+    //   .append("defs")
+    //   .append("linearGradient")
+    //   .attr("id", "legend-gradient");
+
+    // // Append legend
+    // vis.legend = vis.chart
+    //   .append("g")
+    //   .attr("class", "legend")
+    //   .attr(
+    //     "transform",
+    //     `translate(${vis.config.legendLeft},${
+    //       vis.height - vis.config.legendBottom
+    //     })`
+    //   );
+
+    // vis.legendRect = vis.legend
+    //   .append("rect")
+    //   .attr("width", vis.config.legendRectWidth)
+    //   .attr("height", vis.config.legendRectHeight);
+
+    // vis.legendTitle = vis.legend
+    //   .append("text")
+    //   .attr("class", "legend-title")
+    //   .attr("dy", ".35em")
+    //   .attr("y", -10)
+    //   .text("Median Household Income");
   }
 
   updateVis(attribute) {
@@ -138,6 +169,9 @@ class ChoroplethMap {
       // .range(["#f7fbff", "#08306b"])
       .interpolate(d3.interpolateHcl);
 
+    // // define begin and end of the gradient for legend
+    // vis.legendStops = [vis.colorScale.domain()[0], vis.colorScale.domain()[1]];
+
     vis.counties = vis.g
       .append("g")
       .attr("id", "counties")
@@ -157,8 +191,8 @@ class ChoroplethMap {
 
     // Interaction
     vis.counties
-      .on("mousemove", (d, event) => {
-        // console.log(d);
+      .on("mousemove", (d) => {
+        console.log(d);
         // console.log(event);
         if (attribute === "Value") {
           const tooltipData = d.properties[attribute]
@@ -201,9 +235,37 @@ class ChoroplethMap {
         d3.selectAll(".county").style("opacity", "0.2");
         d3.select(this).attr("class", "active");
         d3.selectAll(".active").style("opacity", "1");
+        // const isActive = countyFilter.includes(d.properties.name);
+        // if (isActive) {
+        //   countyFilter = countyFilter.filter((f) => f !== d.properties.name); // remove from filter
+        // } else {
+        //   countyFilter.push(d.properties.name);
+        // }
+        // filterData();
+        // d3.select(this).classed("active", !isActive);
       })
       .on("mouseover", mouseOver)
       .on("mouseout", mouseOut);
+
+    // // Legend Labels
+    // vis.legend
+    //   .selectAll(".legend-labels")
+    //   .data(vis.legendStops)
+    //   .enter()
+    //   .append("text")
+    //   .attr("class", "legend-labels")
+    //   .attr("x", (d, i) => i * 150)
+    //   .attr("y", 20)
+    //   .text((d) => d);
+
+    // // Update gradient for legend
+    // vis.linearGradient
+    //   .selectAll("stop")
+    //   .data(vis.legendStops)
+    //   .enter()
+    //   .append("stop")
+    //   .attr("offset", (d) => d.offset)
+    //   .attr("stop-color", (d) => vis.colorScale(d));
   }
 }
 

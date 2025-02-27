@@ -1,6 +1,7 @@
 const numAttr = ["Value", "Value_x", "Value_y"]; // all number attributes
 let choroplethMap; // global variable for the ChoroplethMap object
 let scatterplot; // global variable for the Scatterplot object
+let countyFilter = []; // global variable for the county filter
 
 Promise.all([d3.json("/counties-10m.json"), d3.csv("/data.csv")])
   .then((data) => {
@@ -24,16 +25,26 @@ Promise.all([d3.json("/counties-10m.json"), d3.csv("/data.csv")])
       }
     });
 
-    // // Scatterplot
-    // scatterplot = new Scatterplot(
+    // bar
+    // barChart = new Barchart(
     //   {
-    //     parentElement: ".viz",
+    //     parentElement: "#bar",
     //   },
-    //   geoData
+    //   values
     // );
 
-    // // Update scatterplot for first time
-    // scatterplot.updateVis("Value");
+    // // Update barchart for first time
+    // barChart.updateVis("Value");
+
+    // scatterplot
+    scatterplot = new Scatterplot(
+      {
+        parentElement: "#scatter",
+      },
+      values
+    );
+    // Update scatterplot for first time
+    scatterplot.updateVis("Value");
     // init choropleth map
     choroplethMap = new ChoroplethMap(
       {
@@ -52,3 +63,18 @@ currentAttr.addEventListener("change", (event) => {
   // call updateVis with the selected attribute
   choroplethMap.updateVis(event.target.value);
 });
+
+// // Filter county with the choropleth map (I could not get this working... I think the way I'm
+// parsing my data could be better...)
+// function filterData() {
+//   if (countyFilter.length === 0) {
+//     // if no county is selected, show all counties
+//     scatterplot.data = data;
+//   } else {
+//     // filter data based on countyFilter
+//     scatterplot.data = data.filter((d) =>
+//       countyFilter.includes(d.properties.name)
+//     );
+//   }
+//   scatterplot.updateVis();
+// }
