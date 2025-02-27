@@ -2,7 +2,7 @@ const numAttr = ["Value", "Value_x", "Value_y"]; // all number attributes
 let choroplethMap; // global variable for the ChoroplethMap object
 let scatterplot; // global variable for the Scatterplot object
 
-Promise.all([d3.json("data/counties-10m.json"), d3.csv("data/data.csv")])
+Promise.all([d3.json("/counties-10m.json"), d3.csv("/data.csv")])
   .then((data) => {
     const geoData = data[0];
     const values = data[1];
