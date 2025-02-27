@@ -1,7 +1,7 @@
 const numAttr = ["Value", "Value_x", "Value_y"]; // all number attributes
 let choroplethMap; // global variable for the ChoroplethMap object
 
-Promise.all([d3.json("counties-10m.json"), d3.csv("data.csv")])
+Promise.all([d3.json("data/counties-10m.json"), d3.csv("data/data.csv")])
   .then((data) => {
     const geoData = data[0];
     const avgIncome = data[1];
@@ -31,6 +31,15 @@ Promise.all([d3.json("counties-10m.json"), d3.csv("data.csv")])
     );
     // update for first time
     choroplethMap.updateVis("Value");
+
+    // Bar chart
+    barChart = new BarChart(
+      {
+        parentElement: ".bar-chart",
+      },
+      datas
+    );
+    barChart.updateVis("Value");
   })
   .catch((error) => console.error(error));
 
