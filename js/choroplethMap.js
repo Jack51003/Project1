@@ -117,9 +117,9 @@ class ChoroplethMap {
       } else if (attr === "Value_x") {
         return ["#fcfbfd", "#3f007d"];
       } else if (attr === "Value_y") {
-        return ["#f7fbff", "#08306b"];
+        return ["#ffffe5", "#004529"];
       }
-      return ["#f7fcf5", "#00441b"];
+      return ["#f7fbff", "#08306b"];
     };
     const mock = d3.extent(vis.data.objects.counties.geometries, (d) => {
       // console.log(d.properties.Value);
